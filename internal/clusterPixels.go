@@ -2,6 +2,7 @@ package picToBric
 
 import (
 	"image"
+	"image/color"
 	"log"
 	"math"
 	"math/rand"
@@ -58,7 +59,7 @@ func createClusters(n int) []Pixel {
 	}
 	clusters := make([]Pixel, n)
 	for i := 0; i < n; i++ {
-		clusters[i-1] = Pixel{int16(rand.Intn(255)), int16(rand.Intn(255)), int16(rand.Intn(255)), i}
+		clusters[i] = Pixel{int16(rand.Intn(255)), int16(rand.Intn(255)), int16(rand.Intn(255)), i}
 	}
 	return clusters
 }
@@ -83,7 +84,35 @@ func kmeans(n int, pixels [][]Pixel) []Pixel {
 			}
 		}
 		// Calculate the new centres and test for convergence
-
+		converged = true
+		for i := 0; i < len(clusters); i++ {
+			if clusterN[i] == 0 {
+				continue
+			}
+			newR := int16(float32(clusterR[i]) / float32(clusterN[i]))
+			newG := int16(float32(clusterG[i]) / float32(clusterN[i]))
+			newB := int16(float32(clusterB[i]) / float32(clusterN[i]))
+			if clusters[i].r != newR || clusters[i].g != newG || clusters[i].b != newB {
+				clusters[i].r = newR
+				clusters[i].g = newG
+				clusters[i].b = newB
+				converged = false
+			}
+		}
 	}
 	return clusters
+}
+
+func clusteredPixelsImg(pixels [][]Pixel, clusters []Pixel) image.Image {
+	width, height := len(pixels[0]), len(pixels)
+	var newImg = image.NewRGBA(image.Rect(0, 0, width, height))
+
+	for i := 0; i < height; i++ {
+		for j := 0; j < width; j++ {
+			cluster := clusters[pixels[i][j].cluster]
+			col := color.RGBA{uint8(cluster.r), uint8(cluster.g), uint8(cluster.b), 255}
+			newImg.Set(i, j, col)
+		}
+	}
+	return newImg
 }

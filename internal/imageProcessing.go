@@ -5,7 +5,7 @@ import (
 	"image"
 
 	// "image/color"
-	_ "image/jpeg"
+	"image/jpeg"
 	_ "image/png"
 	"log"
 	"os"
@@ -25,12 +25,19 @@ func ReadImage(path string) {
 
 	fmt.Println(imageData.Bounds().Size())
 	fmt.Println(imageType)
-	r, g, b, a := imageData.At(0, 1).RGBA()
-	fmt.Println(r >> 8)
-	fmt.Println(g >> 8)
-	fmt.Println(b >> 8)
-	fmt.Println(a >> 8)
 
-	fmt.Println(imgToPixels(imageData)[0][1])
+	pixels := imgToPixels(imageData)
+	clusters := kmeans(10, pixels)
+
+	f, err := os.Create("pixel-test.jpg")
+	if err != nil {
+		log.Fatalf("error creating file: %s", err)
+	}
+	defer f.Close()
+
+	err = jpeg.Encode(f, clusteredPixelsImg(pixels, clusters), nil)
+	if err != nil {
+		log.Fatalf(err.Error())
+	}
 
 }
