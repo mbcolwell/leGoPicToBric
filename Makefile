@@ -1,11 +1,11 @@
 MAIN = picToBric
 BIN = bin/
 CMD = cmd/
-ARGS = 
+PIPE = 
+ARGS = internal/test.jpg
 
 
-# all: build run
-all: build
+all: build run
 
 build:
 	go build -o $(BIN)$(MAIN) $(CMD)$(MAIN).go

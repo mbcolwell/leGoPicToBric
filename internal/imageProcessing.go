@@ -3,10 +3,12 @@ package picToBric
 import (
 	"fmt"
 	"image"
+
+	// "image/color"
+	_ "image/jpeg"
+	_ "image/png"
 	"log"
 	"os"
-	_ "image/png"
-	_ "image/jpeg"
 )
 
 func ReadImage(path string) {
@@ -21,7 +23,14 @@ func ReadImage(path string) {
 		log.Fatalf("Unable to decode file contents into image data (%v)", err)
 	}
 
-	fmt.Println(imageData)
+	fmt.Println(imageData.Bounds().Size())
 	fmt.Println(imageType)
+	r, g, b, a := imageData.At(0, 1).RGBA()
+	fmt.Println(r >> 8)
+	fmt.Println(g >> 8)
+	fmt.Println(b >> 8)
+	fmt.Println(a >> 8)
+
+	fmt.Println(imgToPixels(imageData)[0][1])
 
 }
